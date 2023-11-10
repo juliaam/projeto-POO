@@ -1,18 +1,18 @@
 import nReadlines from 'n-readlines'
-// import promptsync from 'prompt-sync'
-// const prompt = promptsync({sigint: true})
 
-let arq = new nReadlines('OK_CtrlEspacoAereo.asta')
+let arq = new nReadlines('pilotos.txt')
 let buf
 let linha
+let dados = []
 
-arq.next()
+// arq.next() // pular a primeira linha
 
-
-while(buf = arq.next()){
-    linha = buf.toString('utf8') 
-    console.log(linha)
-}
+// while(buf = arq.next()){
+//     linha = buf.toString('utf8') 
+//     linha = linha.split(',')
+//     dados = [{matricula: linha[0], nome:linha[1], habilitacaoAtiva: linha[2].replace('\r', '')}]
+//     console.log(dados[0])
+// }
 
 class Piloto {
     #matricula
@@ -24,11 +24,22 @@ class Piloto {
         this.#nome = nome
         this.#habilitacaoAtiva = habilitacaoAtiva
     }
+
+    get matricula() {
+        return this.#matricula
+    }    
 }
 class ServicoPilotos extends Piloto {
+    #pilotos = []
 
-    recupera(matricula) { // deve retornar a matricula da matricula fornecida
-        return super.matricula
+
+    adicionarPiloto(piloto) {
+        return this.#pilotos.push(piloto);
+    }
+
+    recupera(matricula) {
+        console.log(this.#pilotos)
+        return this.#pilotos.find(piloto => piloto.matricula === matricula);
     }
     todos() { // pesquisar pra ver como faz isso de retornar todos os pilotos armazenados (no trem acredito ter)
         let todos = []
@@ -108,3 +119,8 @@ class ServicoAerovias extends Aerovia {
         return 
     }
 }
+
+const p01 = new Piloto('p01', 'teste', 'ativo')
+const servico = new ServicoPilotos()
+servico.adicionarPiloto(p01)
+console.log(servico.recupera('j01'))

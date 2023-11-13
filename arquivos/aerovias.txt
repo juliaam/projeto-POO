@@ -1,0 +1,5 @@
+br01sprj, São Paulo, Rio de Janeiro, 400
+br02sprj, Rio de Janeiro, São Paulo, 400
+br01essc, Espírito Santo, Santa Catarina, 1700
+br02sces, Santa Catarina, Espírito Santo, 1700
+br01mggo, Minas Gerais, Goiás, 990

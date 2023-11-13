@@ -1,19 +1,12 @@
 import nReadlines from "n-readlines";
-// import { validate } from 'bycontract'
 
-let arq = new nReadlines("pilotos.txt");
+// exemplo de uso
+const pilotos = new nReadlines("arquivos/pilotos.txt");
+const aerovias = new nReadlines("arquivos/aerovias.txt");
+const aeronaves = new nReadlines("arquivos/aeronaves.txt");
+
 let buf;
 let linha;
-let dados = [];
-
-// arq.next() // pular a primeira linha
-
-// while(buf = arq.next()){
-//     linha = buf.returnInfo('utf8')
-//     linha = linha.split(',')
-//     dados = [{matricula: linha[0], nome:linha[1], habilitacaoAtiva: linha[2].replace('\r', '')}]
-//     console.log(dados[0])
-// }
 
 class Piloto {
   #matricula;
@@ -35,10 +28,13 @@ class Piloto {
     return this.#nome;
   }
   get habilitacaoAtiva() {
-    return this.#habilitacaoAtiva;
+    if (this.#habilitacaoAtiva) {
+      return "ativo";
+    }
+    return "inativo";
   }
   returnInfo() {
-    return `Piloto de matrícula: ${this.matricula}, nome: ${this.nome} e estado da habilitação: ${this.habilitacaoAtiva}`;
+    return `Piloto de matrícula: ${this.matricula}, nome: ${this.nome}, estado da habilitação: ${this.habilitacaoAtiva}`;
   }
 }
 class ServicoPilotos extends Piloto {
@@ -49,12 +45,10 @@ class ServicoPilotos extends Piloto {
   }
 
   adicionarPiloto(piloto) {
-    // validate(arguments, ['Piloto'])
     return this.#pilotos.push(piloto);
   }
   recupera(matricula) {
     // função que acha o piloto pelo find, e, caso tenha piloto, ele irá retorná-lo
-    // validate(arguments, ['string'])
     const piloto = this.#pilotos.find(
       (piloto) => piloto.matricula === matricula
     );
@@ -79,7 +73,7 @@ class Aeronave {
   #autonomia;
 
   constructor(prefixo, velocidadeCruzeiro, autonomia) {
-    // validate(arguments, ['string', 'number', 'number'])
+
 
     if (velocidadeCruzeiro < 0) {
       throw new Error("Velocidade inválida, digite novamente");
@@ -101,27 +95,31 @@ class Aeronave {
     return this.#autonomia;
   }
   returnInfo() {
-    return `Aeronave - prefixo: ${this.prefixo}, velocidade de cruzeiro: ${this.velocidadeCruzeiro},
-     de autonomia: ${this.autonomia}`;
+    return `Aeronave - prefixo: ${this.prefixo}, velocidade de cruzeiro: ${this.velocidadeCruzeiro}km,
+     autonomia: ${this.autonomia}km`;
   }
 }
 
 class AeronaveParticular extends Aeronave {
   #respManutencao;
 
-  constructor(respManutencao, prefixo, velocidadeCruzeiro, autonomia) {
-    // validate(arguments, ['string', 'string', 'number', 'number'])
-    this.#respManutencao = respManutencao;
+  constructor(prefixo, velocidadeCruzeiro, autonomia, respManutencao) {
     super(prefixo, velocidadeCruzeiro, autonomia);
+    this.#respManutencao = respManutencao;
+  }
+  get respManutencao() {
+    return this.#respManutencao
+  }
+  returnInfo() {
+    return `Aeronave - prefixo: ${this.prefixo}, velocidade de cruzeiro: ${this.velocidadeCruzeiro}km,
+     autonomia: ${this.autonomia}km, responsável pela manutenção: ${this.respManutencao}`;
   }
 }
 
 class AeronaveComercial extends Aeronave {
   #nomeCIA;
 
-  constructor(nomeCIA, prefixo, velocidadeCruzeiro, autonomia) {
-    // nome da companhia aérea
-    // validate(arguments, ['string', 'string', 'number', 'number'])
+  constructor( prefixo, velocidadeCruzeiro, autonomia, nomeCIA) {
     this.#nomeCIA = nomeCIA;
     super(prefixo, velocidadeCruzeiro, autonomia);
   }
@@ -130,8 +128,7 @@ class AeronaveComercial extends Aeronave {
 class AeronavePassageiros extends AeronaveComercial {
   #maxPassageiros;
 
-  constructor(maxPassageiros, nomeCIA, prefixo, velocidadeCruzeiro, autonomia) {
-    // validate(arguments, ['number','string', 'string', 'number', 'number'])
+  constructor( nomeCIA, prefixo, velocidadeCruzeiro, autonomia, maxPassageiros) {
     this.#maxPassageiros = maxPassageiros;
     super(nomeCIA, prefixo, velocidadeCruzeiro, autonomia);
   }
@@ -140,8 +137,7 @@ class AeronavePassageiros extends AeronaveComercial {
 class AeronaveCarga extends AeronaveComercial {
   #pesoMax;
 
-  constructor(pesoMax) {
-    // validate(arguments, ['number','string', 'string', 'number', 'number'])
+  constructor(nomeCIA, prefixo, velocidadeCruzeiro, autonomia, pesoMax) {
     this.#pesoMax = pesoMax;
     super(nomeCIA, prefixo, velocidadeCruzeiro, autonomia);
   }
@@ -169,16 +165,13 @@ class ServicoAeronaves extends Aeronave {
 }
 
 class Aerovia {
-  #id; // string
+  #id;
   #origem;
   #destino;
   #tamanho;
-  static #idHelper = 0;
 
-  constructor(origem, destino, tamanho) {
-    Aerovia.#idHelper++;
-    this.#id = Aerovia.#idHelper;
-
+  constructor(id, origem, destino, tamanho) {
+    this.#id = id;
     this.#origem = origem;
     this.#destino = destino;
     this.#tamanho = tamanho;
@@ -201,7 +194,7 @@ class Aerovia {
 
   returnInfo() {
     return `Aerovia - id: ${this.id}, origem: ${this.origem},
-     destino: ${this.destino}, de tamanho: ${this.tamanho}`;
+     destino: ${this.destino}, tamanho: ${this.tamanho}km`;
   }
 }
 
@@ -213,36 +206,56 @@ class ServicoAerovias extends Aerovia {
   }
   recupera(origem, destino) {
     const aerovia = this.#aerovias.find(
-        (aerovia) => aerovia.origem === origem && aerovia.destino === destino
-      );
-    return aerovia.returnInfo()
+      (aerovia) => aerovia.origem === origem && aerovia.destino === destino
+    );
+    return aerovia.returnInfo();
   }
 }
 
-const p01 = new Piloto("p01", "teste", "ativo");
-const p02 = new Piloto("p02", "teste2", "inativo");
-const servico = new ServicoPilotos();
-
-const a01 = new Aeronave("PT-ABCD", 10, 10);
-const a02 = new Aeronave("PT-ABCD", 10, 10);
+// exemplo de uso
 
 
-const servicoAerovia = new ServicoAerovias()
-const av01 = new Aerovia('COSMOS', 'PACIENCIA', 10)
-const av02 = new Aerovia('BANGU', 'STA CRUZ', 10)
-servicoAerovia.adicionarAerovia(av01)
-servicoAerovia.adicionarAerovia(av02)
-
-
-
+// criados os serviços
+const servicoPiloto = new ServicoPilotos();
 const servicoAeronave = new ServicoAeronaves();
+const servicoAerovia = new ServicoAerovias()
 
-servico.adicionarPiloto(p01);
-servico.adicionarPiloto(p02);
+// leitura dos arquivos, e toda vez a função vai adicionar um pertencente a classe, e automaticamente adicionar ao serviço também
+while ((buf = pilotos.next())) {
+  // leitura do arquivo de pilotos
+  linha = buf.toString("utf8");
+  linha = linha.split(",");
 
-servicoAeronave.adicionarAeronave(a01);
-servicoAeronave.adicionarAeronave(a02);
+  let habilitacaoAtiva = linha[2].trim() === "ativo" ? true : false; // tirar os espaços e transformar em booleano
+  const piloto = new Piloto(linha[0], linha[1].trim(), habilitacaoAtiva); // criar um novo piloto e remover os espaços em branco
+  servicoPiloto.adicionarPiloto(piloto); // adicionar piloto ao serviço
+}
 
-console.log(servicoAerovia.recupera('BANGU', 'STA CRUZ'));
+while ((buf = aeronaves.next())) {
+  // leitura do arquivo de aerovias
+  linha = buf.toString("utf8");
+  linha = linha.split(",");
+  const aeronave = new AeronaveParticular( // atribuição dos valores
+    linha[0].trim(),
+    Number(linha[1].trim()),
+    Number(linha[2].replace("\r", "").trim()),
+    linha[3].trim()
+  ); // nesse caso foram adicionadas aeronaves particulares, mas podem ser adicionadas outras
+  servicoAeronave.adicionarAeronave(aeronave); // 
+}
 
-// console.log(servico.todos())
+while ((buf = aerovias.next())) {
+  // leitura do arquivo de aerovias
+  linha = buf.toString("utf8");
+  linha = linha.split(",");
+  const aerovia = new Aerovia( // atribuição dos valores
+    linha[0].trim(),
+    linha[1].trim(),
+    linha[2].trim(),
+    Number(linha[3].replace("\r", ""))
+  );  
+  servicoAerovia.adicionarAerovia(aerovia);
+}
+
+
+

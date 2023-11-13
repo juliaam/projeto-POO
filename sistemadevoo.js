@@ -1,4 +1,6 @@
 import nReadlines from "n-readlines";
+import prompt from "prompt-sync";
+const input = prompt();
 
 // exemplo de uso
 const pilotos = new nReadlines("arquivos/pilotos.txt");
@@ -14,7 +16,6 @@ class Piloto {
   #habilitacaoAtiva;
 
   constructor(matricula, nome, habilitacaoAtiva) {
-    // validate(arguments, ['string', 'string', 'string'])
 
     this.#matricula = matricula;
     this.#nome = nome;
@@ -73,8 +74,6 @@ class Aeronave {
   #autonomia;
 
   constructor(prefixo, velocidadeCruzeiro, autonomia) {
-
-
     if (velocidadeCruzeiro < 0) {
       throw new Error("Velocidade inválida, digite novamente");
     }
@@ -108,7 +107,7 @@ class AeronaveParticular extends Aeronave {
     this.#respManutencao = respManutencao;
   }
   get respManutencao() {
-    return this.#respManutencao
+    return this.#respManutencao;
   }
   returnInfo() {
     return `Aeronave - prefixo: ${this.prefixo}, velocidade de cruzeiro: ${this.velocidadeCruzeiro}km,
@@ -119,7 +118,7 @@ class AeronaveParticular extends Aeronave {
 class AeronaveComercial extends Aeronave {
   #nomeCIA;
 
-  constructor( prefixo, velocidadeCruzeiro, autonomia, nomeCIA) {
+  constructor(prefixo, velocidadeCruzeiro, autonomia, nomeCIA) {
     this.#nomeCIA = nomeCIA;
     super(prefixo, velocidadeCruzeiro, autonomia);
   }
@@ -128,7 +127,7 @@ class AeronaveComercial extends Aeronave {
 class AeronavePassageiros extends AeronaveComercial {
   #maxPassageiros;
 
-  constructor( nomeCIA, prefixo, velocidadeCruzeiro, autonomia, maxPassageiros) {
+  constructor(nomeCIA, prefixo, velocidadeCruzeiro, autonomia, maxPassageiros) {
     this.#maxPassageiros = maxPassageiros;
     super(nomeCIA, prefixo, velocidadeCruzeiro, autonomia);
   }
@@ -151,7 +150,6 @@ class ServicoAeronaves extends Aeronave {
   }
 
   adicionarAeronave(aeronave) {
-    // validate(arguments, ['Aeronave'])
     return this.#aeronaves.push(aeronave);
   }
   todas() {
@@ -214,11 +212,10 @@ class ServicoAerovias extends Aerovia {
 
 // exemplo de uso
 
-
 // criados os serviços
 const servicoPiloto = new ServicoPilotos();
 const servicoAeronave = new ServicoAeronaves();
-const servicoAerovia = new ServicoAerovias()
+const servicoAerovia = new ServicoAerovias();
 
 // leitura dos arquivos, e toda vez a função vai adicionar um pertencente a classe, e automaticamente adicionar ao serviço também
 while ((buf = pilotos.next())) {
@@ -241,7 +238,7 @@ while ((buf = aeronaves.next())) {
     Number(linha[2].replace("\r", "").trim()),
     linha[3].trim()
   ); // nesse caso foram adicionadas aeronaves particulares, mas podem ser adicionadas outras
-  servicoAeronave.adicionarAeronave(aeronave); // 
+  servicoAeronave.adicionarAeronave(aeronave); //
 }
 
 while ((buf = aerovias.next())) {
@@ -253,9 +250,55 @@ while ((buf = aerovias.next())) {
     linha[1].trim(),
     linha[2].trim(),
     Number(linha[3].replace("\r", ""))
-  );  
+  );
   servicoAerovia.adicionarAerovia(aerovia);
 }
 
-
-
+while (!fim) {
+  let fim = false;
+  let string =
+    "1- Listar pilotos \n 2-Adicionar piloto\n 3-Listar aeronaves \n 4-Adicionar aeronave \n 5-Listar aerovias \n 6- Adicionar aerovia \n 0-sair";
+  console.log(string)
+  const inputReceived = input("Insira a opção selecionada: ");
+  if (inputReceived == 0) {
+    fim = true;
+  }
+  switch(inputReceived) {
+    case '0':
+      fim = true
+      break
+    case '1':
+      console.log(servicoPiloto.todos())
+      break
+    case '2':
+      console.log('Digite a matrícula, nome, e o estado da habilitação (ativo/inativo)')
+      console.log(servicoPiloto.adicionarPiloto(inputReceived))
+      break
+    case '3':
+      console.log(servicoAeronave.todas())
+      break
+    case '4':
+      const inputAeronave = input('')
+      console.log('1- Aeronave particular \n 2- Aeronave passageiro \n 3- Aeronave Carga \n 0 - voltar')
+      if(inputAeronave == '1') {
+        console.log('Digite o prefixo, velocidade do cruzeiro(km), autonomia(km) e o responsável pela manutenção') // particular
+        console.log(servicoAeronave.adicionarAeronave(inputAeronave))
+      }
+      if(inputAeronave == '2') {
+        console.log('Digite o prefixo, velocidade do cruzeiro(km), autonomia(km), companhia aérea e o máximo de passageiros') // aeronave passageiro
+        console.log(servicoAeronave.adicionarAeronave(inputAeronave))
+      }
+      if(inputAeronave == '3') {
+        console.log('Digite o prefixo, velocidade do cruzeiro(km), autonomia(km), companhia aérea e o peso máximo') // aeronave carga
+        console.log(servicoAeronave.adicionarAeronave(inputAeronave))
+      }
+      break  
+    case '5':
+      console.log(servicoAerovia.todas())
+      break  
+    case '6':
+      console.log('Digite o id, origem, destino e o tamanho')
+      console.log(servicoAerovia.adicionarAerovia(inputReceived))
+      break  
+  }
+}

@@ -33,7 +33,7 @@ class Piloto {
     }
     return "inativo";
   }
-  returnInfo() {
+  returnInfo() { // função para mandar em escrito as informações
     return `Piloto de matrícula: ${this.matricula}, nome: ${this.nome}, estado da habilitação: ${this.habilitacaoAtiva}`;
   }
 }
@@ -73,7 +73,7 @@ class Aeronave {
   #autonomia;
 
   constructor(prefixo, velocidadeCruzeiro, autonomia) {
-    if (velocidadeCruzeiro < 0) {
+    if (velocidadeCruzeiro < 0) { // validação dos parâmetros
       throw new Error("Velocidade inválida, digite novamente");
     }
     if (autonomia < 0) {
@@ -206,7 +206,6 @@ class Aerovia {
 class ServicoAerovias extends Aerovia {
   #aerovias = [];
 
-
   adicionarAerovia(aerovia) {
     return this.#aerovias.push(aerovia);
   }
@@ -222,7 +221,7 @@ class ServicoAerovias extends Aerovia {
   }
 }
 
-// exemplo de uso
+// exemplo de uso (menu)
 
 // criados os serviços
 const servicoPiloto = new ServicoPilotos();
